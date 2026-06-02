@@ -7,7 +7,13 @@ from services.google_docs import get_google_docs_service, extract_text_from_doc,
 router = APIRouter(prefix="/api/sync", tags=["Admin - Đồng bộ Google Docs"])
 
 @router.post("/{story_id}")
-def sync_story_from_google_docs(story_id: int, db: Session = Depends(get_db)):
+def sync_story_from_google_docs(story_id: int, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
+    # KIỂM TRA QUYỀN ADMIN:
+    if current_user.username != "admin":
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Chỉ Admin mới có quyền ra lệnh cào dữ liệu và đồng bộ chương truyện!"
+        )
     # 1. Tìm bộ truyện trong MySQL
     story = db.query(models.Story).filter(models.Story.id == story_id).first()
     if not story or not story.google_doc_id:

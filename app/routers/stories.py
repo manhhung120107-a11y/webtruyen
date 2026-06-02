@@ -87,7 +87,13 @@ class StoryCreateSchema(BaseModel):
 
 # 6. API THÊM TRUYỆN MỚI
 @router.post("/")
-def create_story(story_data: StoryCreateSchema, db: Session = Depends(get_db)):
+def create_story(story_data: StoryCreateSchema, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
+    # KIỂM TRA QUYỀN ADMIN: Nếu username trong Token không phải 'admin' -> Đuổi thẳng!
+    if current_user.username != "admin":
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Bạn không có quyền thực hiện chức năng này. Chỉ dành cho Admin!"
+        )
     # Tạo đối tượng truyện mới trong database
     new_story = models.Story(
         title=story_data.title,
@@ -103,7 +109,13 @@ def create_story(story_data: StoryCreateSchema, db: Session = Depends(get_db)):
 
 # 7. API XÓA TRUYỆN (Sẽ tự động xóa chương và lịch sử liên quan nếu cài Cascade, hoặc xóa thủ công)
 @router.delete("/{story_id}")
-def delete_story(story_id: int, db: Session = Depends(get_db)):
+def delete_story(story_id: int, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
+    # KIỂM TRA QUYỀN ADMIN:
+    if current_user.username != "admin":
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Hành động bị từ chối! Chỉ tài khoản Admin mới được xóa truyện."
+        )
     story = db.query(models.Story).filter(models.Story.id == story_id).first()
     if not story:
         raise HTTPException(status_code=404, detail="Không tìm thấy bộ truyện này!")

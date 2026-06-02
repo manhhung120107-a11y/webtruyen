@@ -2,6 +2,11 @@ from pydantic import BaseModel
 from typing import Optional, List
 from datetime import datetime
 
+# Schema hứng dữ liệu đăng ký tài khoản mới
+class UserRegister(BaseModel):
+    username: str
+    password: str
+
 # --- SCHEMAS CHO CHƯƠNG (CHAPTER) ---
 class ChapterBase(BaseModel):
     chapter_number: int
