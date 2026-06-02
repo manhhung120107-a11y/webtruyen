@@ -3,6 +3,8 @@ from sqlalchemy.orm import Session
 import models, schemas
 from database import get_db
 from services.google_docs import get_google_docs_service, extract_text_from_doc, parse_chapters
+from routers.auth import get_current_user
+from models import User
 
 router = APIRouter(prefix="/api/sync", tags=["Admin - Đồng bộ Google Docs"])
 

@@ -4,6 +4,7 @@ from typing import List
 import models, schemas
 from database import get_db
 from routers.auth import get_current_user
+from models import User
 from pydantic import BaseModel
 
 router = APIRouter(prefix="/api/stories", tags=["User - Đọc Truyện"])
