@@ -1,7 +1,7 @@
 from fastapi import FastAPI, Depends
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
-from sqlalchemy import text # <-- THÊM DÒNG NÀY ĐỂ CHẠY SQL THUẦN CHỐNG NGỦ
+from sqlalchemy import text # <-- Bắt buộc phải có dòng này
 from database import engine, get_db
 import models
 from routers import stories, admin, sync, auth 
@@ -27,11 +27,11 @@ app.include_router(sync.router)
 def read_root(db: Session = Depends(get_db)):
     return {"status": "success", "message": "Server đang chạy mượt mà."}
 
-# ----- CẤU HÌNH API CHỐNG NGỦ CHO AIVEN Ở ĐÂY -----
-@app.get("/keep-alive")
+# ĐỊNH NGHĨA LẠI: Chấp nhận cả GET (bạn test) và HEAD (UptimeRobot dùng)
+@app.api_route("/keep-alive", methods=["GET", "HEAD"])
 def keep_alive(db: Session = Depends(get_db)):
     try:
-        # Bắt SQL thực hiện câu lệnh siêu nhẹ "SELECT 1" để Aiven không bị ngủ đông
+        # Gõ cửa database để Aiven không ngủ đông
         db.execute(text("SELECT 1"))
         return {"status": "success", "message": "Database và Server đã thức giấc!"}
     except Exception as e:
